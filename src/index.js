@@ -51,6 +51,7 @@ class Game extends React.Component {
             history: [{
                 squares: Array(9).fill(null),
                 lastMoveLocation: null,
+                stepSelected: false,
             }],
             stepNumber: 0,
             xIsNext: true
@@ -70,6 +71,7 @@ class Game extends React.Component {
             history: history.concat([{
                 squares: squares,
                 lastMoveLocation: loc,
+                stepSelected: false,
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
@@ -77,7 +79,14 @@ class Game extends React.Component {
     }
 
     jumpTo(step) {
+        let newHistory = this.state.history;
+        newHistory = newHistory.map((step) => {
+            step.stepSelected = false;
+            return step;
+        });
+        newHistory[step].stepSelected = true;
         this.setState({
+            history: newHistory,
             stepNumber: step,
             xIsNext: (step % 2) === 0,
         })
@@ -95,9 +104,14 @@ class Game extends React.Component {
             const locationOfMove = move ?
                 step.lastMoveLocation :
                 '';
+            // if the move to display is the currently selected one, embolden the description
+            let modifiedDesc = desc;
+            if (step.stepSelected) {
+                modifiedDesc = <strong>{desc}</strong>;
+            }
             return (
                 <li key={move}>
-                    <button onClick={() => this.jumpTo(move)}>{desc}</button>
+                    <button onClick={() => this.jumpTo(move)}>{modifiedDesc}</button>
                     <div>{locationOfMove}</div>
                 </li>
             );
